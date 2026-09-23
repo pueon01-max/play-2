@@ -1,0 +1,22 @@
+# Local build / deployment artifacts
+.openai/
+.sites-publish-*/
+dist/
+outputs/
+public/
+work/
+
+# Earlier experiments kept locally for reference
+index-rebrief.html
+PORTFOLIO-REBRIEF.md
+gloss.css
+script.js
+style.css
+three.css
+vinyl-journey.css
+vinyl-journey.js
+
+# Editor and OS files
+.DS_Store
+Thumbs.db
+.vscode/
