@@ -383,6 +383,9 @@ addEventListener('DOMContentLoaded',()=>{
 body.exploring .mix-load{opacity:0}
 @media(max-width:720px){.mix-load{top:calc(14px + env(safe-area-inset-top,0px));right:50%;translate:50% 0;width:min(250px,calc(100vw - 150px));padding:7px 12px 7px 7px;gap:10px;transform-origin:50% 0}.mix-load:not(.loading){opacity:0;visibility:hidden}.mix-load.loading{z-index:49}.ml-art{width:34px;height:34px;border-radius:9px}.ml-txt small{font-size:9px}.ml-txt b{font-size:13px}.ml-eq{display:none}}
 @media(prefers-reduced-motion:reduce){.ml-eq i{animation:none}}
+/* Reduced motion keeps the intro (as a still frame); it only disappears once done. */
+.reduced .intro:not(.done){display:block!important}
+@media(prefers-reduced-motion:reduce){.intro:not(.done){display:block!important}}
 </style>
 <div class="mix-load on" id="mix-load" role="status" aria-live="polite"><span class="ml-art" id="ml-art" aria-hidden="true"></span><span class="ml-txt"><small id="ml-mix">CHILL MIX</small><b id="ml-title">The Way I Listen</b></span><span class="ml-eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span><i class="ml-bar" aria-hidden="true"></i></div>
 <script>
@@ -414,12 +417,13 @@ addEventListener('DOMContentLoaded',()=>{
     function endIntro(){if(ended)return;ended=true;intro.classList.add('done');document.body.style.overflow='';setTimeout(()=>{intro.style.clipPath=intro.style.transform=intro.style.opacity=''},700)}
     function finishIntro(fast){if(reduceIntro){endIntro();return}if(exitAt)return;exitDur=fast?1300:2000;exitAt=performance.now();intro.classList.add('leaving')}
     skip.onclick=()=>{clearTimeout(exitTimer);finishIntro(true)};
-    if(reduceIntro){endIntro();return}
+    /* Reduced motion: still show the intro, as a calm still frame — full sentence, no typing or fly-away — then fade out. */
+    if(reduceIntro){lines.forEach(el=>{el.textContent=el.dataset.text;el.classList.add('on')});lines[lines.length-1].append(caret);caret.classList.add('idle');typedDone=true;const hold=()=>{exitTimer=setTimeout(endIntro,2600)};document.readyState==='complete'?hold():addEventListener('load',hold,{once:true})}
     /* Hangul typing: each syllable is built from its jamo, like a real keyboard (ㄷ → 다, ㄹ → 르 → 른). */
     const CHO='ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ';
     function strokes(ch){const c=ch.charCodeAt(0)-0xAC00;if(c<0||c>11171)return[ch];const cho=Math.floor(c/588),jung=Math.floor(c%588/28),jong=c%28,out=[CHO[cho],String.fromCharCode(0xAC00+cho*588+jung*28)];if(jong)out.push(ch);return out}
     const plan=[];lines.forEach((el,li)=>{const text=el.dataset.text;let done='';for(const ch of text){const st=strokes(ch);st.forEach((s,k)=>plan.push({li,txt:done+s,hard:k===st.length-1&&ch!==' ',space:ch===' '}));done+=ch}plan.push({li,pause:true})});
-    let pi=0;function typeNext(){if(exitAt)return;const s=plan[pi++];if(!s){typedDone=true;caret.classList.add('idle');exitTimer=setTimeout(()=>finishIntro(false),900);return}
+    let pi=0;function typeNext(){if(exitAt||reduceIntro)return;const s=plan[pi++];if(!s){typedDone=true;caret.classList.add('idle');exitTimer=setTimeout(()=>finishIntro(false),900);return}
       if(s.pause){setTimeout(typeNext,s.li===0?220:0);return}
       const el=lines[s.li];el.textContent=s.txt;el.append(caret);el.classList.add('on');
       setTimeout(typeNext,s.space?70:22+Math.random()*22)}
