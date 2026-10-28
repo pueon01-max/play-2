@@ -6,15 +6,15 @@ outputs/
 public/
 work/
 
-# Earlier experiments kept locally for reference
-index-rebrief.html
-PORTFOLIO-REBRIEF.md
-gloss.css
-script.js
-style.css
-three.css
-vinyl-journey.css
-vinyl-journey.js
+# Earlier experiments kept locally for reference (root only, so work sites under works/ still ship)
+/index-rebrief.html
+/PORTFOLIO-REBRIEF.md
+/gloss.css
+/script.js
+/style.css
+/three.css
+/vinyl-journey.css
+/vinyl-journey.js
 
 # Editor and OS files
 .DS_Store
